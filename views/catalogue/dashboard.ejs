@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-catalogue') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-speedometer2 me-2"></i>Tableau de bord — Catalogue</h4>
+        <span class="badge" style="background:#d97706; padding:8px 15px; border-radius:20px;">
+            <i class="bi bi-tags me-1"></i>Gestionnaire Catalogue
+        </span>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.categories || 0 %></div><div>Catégories</div></div>
+                    <i class="bi bi-tags-fill stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#15803d);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.produits || 0 %></div><div>Produits</div></div>
+                    <i class="bi bi-box-seam stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.promos || 0 %></div><div>Promos actives</div></div>
+                    <i class="bi bi-percent stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" style="background:#064e3b; color:white;">
+            <i class="bi bi-lightning-charge-fill me-2"></i>Accès rapides
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <a href="/catalogue/categories" class="btn btn-outline-warning w-100 py-3">
+                        <i class="bi bi-tags-fill d-block fs-3 mb-2"></i>Catégories</a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/catalogue/produits" class="btn btn-outline-success w-100 py-3">
+                        <i class="bi bi-box-seam d-block fs-3 mb-2"></i>Produits</a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/catalogue/promotions" class="btn btn-outline-danger w-100 py-3">
+                        <i class="bi bi-percent d-block fs-3 mb-2"></i>Promotions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

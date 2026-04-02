@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-fournisseur') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-truck me-2"></i>Mes Commandes</h4>
+    </div>
+    <% if (success && success.length > 0) { %><div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i><%= success %></div><% } %>
+    <% if (error && error.length > 0) { %><div class="alert alert-danger"><i class="bi bi-exclamation-circle-fill me-2"></i><%= error %></div><% } %>
+
+    <% if (!commandes || commandes.length === 0) { %>
+        <div class="card">
+            <div class="card-body text-center p-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                Aucune commande pour l'instant.
+            </div>
+        </div>
+    <% } else { %>
+        <% commandes.forEach(c => { %>
+        <% const lignes = c.lignes || []; %>
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center"
+                 style="background:<%= c.statut === 'en_attente' ? '#f59e0b' : c.statut === 'livree' ? '#16a34a' : '#6b7280' %>; color:white;">
+                <div>
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    <strong><%= c.reference %></strong>
+                    <span class="ms-3 badge bg-white text-dark"><%= c.statut.replace('_',' ') %></span>
+                </div>
+                <div class="text-end">
+                    <small>Créé par : <%= c.createur_prenom %> <%= c.createur_nom %></small><br>
+                    <small>Date : <%= new Date(c.date_commande).toLocaleDateString('fr-FR') %></small>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-list-ul me-2"></i>Produits commandés :</h6>
+                <% if (lignes.length === 0) { %>
+                    <p class="text-muted">Aucun produit dans cette commande.</p>
+                <% } else { %>
+                <table class="table table-sm mb-3">
+                    <thead style="background:#f0fdf4;">
+                        <tr>
+                            <th class="px-3">Produit</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Sous-total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% lignes.forEach(l => { %>
+                        <tr>
+                            <td class="px-3 fw-semibold"><i class="bi bi-basket2 me-2 text-success"></i><%= l.produit_nom %></td>
+                            <td><span class="badge bg-success"><%= l.quantite %></span></td>
+                            <td><%= parseFloat(l.prix_unitaire).toLocaleString('fr-FR') %> FCFA</td>
+                            <td><strong><%= (l.quantite * parseFloat(l.prix_unitaire)).toLocaleString('fr-FR') %> FCFA</strong></td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+                <% } %>
+
+                <% if (c.statut === 'en_attente') { %>
+                <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Cette commande attend votre livraison.</strong>
+                        En cliquant sur "Fournir", le stock sera automatiquement mis à jour.
+                    </div>
+                    <form action="/fournisseur/commandes/<%= c.id %>/fournir" method="POST"
+                          onsubmit="return confirm('Confirmer la livraison ? Le stock sera mis à jour automatiquement.')">
+                        <button type="submit" class="btn text-white fw-bold px-4"
+                                style="background:linear-gradient(135deg,#16a34a,#064e3b); border:none; border-radius:10px;">
+                            <i class="bi bi-truck me-2"></i>Fournir cette commande
+                        </button>
+                    </form>
+                </div>
+                <% } else if (c.statut === 'livree') { %>
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Livrée !</strong> Le stock a été mis à jour automatiquement.
+                </div>
+                <% } else if (c.statut === 'annulee') { %>
+                <div class="alert alert-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Cette commande a été annulée.
+                </div>
+                <% } %>
+            </div>
+        </div>
+        <% }) %>
+    <% } %>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

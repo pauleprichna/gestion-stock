@@ -1,0 +1,21 @@
+<div class="sidebar">
+    <%- include('profil-sidebar') %>
+    <nav class="nav flex-column">
+        <a href="/admin/dashboard" class="nav-link <%= title.includes('Dashboard') ? 'active' : '' %>">
+            <i class="bi bi-speedometer2"></i> Tableau de bord</a>
+        <a href="/admin/utilisateurs" class="nav-link <%= title.includes('Utilisateur') ? 'active' : '' %>">
+            <i class="bi bi-people-fill"></i> Utilisateurs</a>
+        <a href="/admin/ventes" class="nav-link <%= title.includes('Vente') ? 'active' : '' %>">
+            <i class="bi bi-cash-coin"></i> Ventes</a>
+        <a href="/admin/stock" class="nav-link <%= title.includes('Stock') ? 'active' : '' %>">
+            <i class="bi bi-boxes"></i> État du stock</a>
+        <a href="/admin/fournisseurs" class="nav-link <%= title.includes('Fournisseur') ? 'active' : '' %>">
+            <i class="bi bi-truck"></i> Fournisseurs</a>
+        <a href="/admin/parametres" class="nav-link <%= title.includes('Paramètre') ? 'active' : '' %>">
+            <i class="bi bi-gear-fill"></i> Paramètres</a>
+        <a href="/profil" class="nav-link <%= title.includes('Profil') ? 'active' : '' %>">
+            <i class="bi bi-person-gear"></i> Mon profil</a>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:10px 20px;">
+        <a href="/auth/logout" class="nav-link logout-btn"><i class="bi bi-box-arrow-left"></i> Déconnexion</a>
+    </nav>
+</div>

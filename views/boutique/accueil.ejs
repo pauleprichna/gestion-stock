@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Market — Boutique</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background:#f0fdf4; font-family:'Segoe UI',sans-serif; }
+        .navbar-boutique {
+            background: linear-gradient(135deg, #064e3b, #16a34a);
+            padding: 15px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .navbar-boutique .brand { color:white; font-size:1.4rem; font-weight:800; text-decoration:none; }
+        .btn-panier {
+            background: #f59e0b; border: none; color: white;
+            padding: 10px 20px; border-radius: 25px; font-weight: 700;
+            position: relative; cursor: pointer;
+        }
+        .btn-panier:hover { background:#d97706; color:white; }
+        .panier-badge {
+            position: absolute; top: -8px; right: -8px;
+            background: #dc2626; color: white; border-radius: 50%;
+            width: 22px; height: 22px; font-size: 0.75rem;
+            display: flex; align-items:center; justify-content:center; font-weight: 700;
+        }
+        .produit-card {
+            background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s; height: 100%;
+        }
+        .produit-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .produit-img { width: 100%; height: 180px; object-fit: cover; }
+        .produit-img-placeholder {
+            width: 100%; height: 180px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            display: flex; align-items:center; justify-content:center;
+        }
+        .btn-ajouter {
+            background: linear-gradient(135deg, #16a34a, #064e3b);
+            border: none; color: white; padding: 10px;
+            border-radius: 10px; font-weight: 600; width: 100%; transition: all 0.2s;
+        }
+        .btn-ajouter:hover { opacity:0.9; transform:scale(1.02); }
+        .prix { color: #16a34a; font-size: 1.2rem; font-weight: 800; }
+        .prix-barre { text-decoration:line-through; color:#9ca3af; font-size:0.9rem; }
+        .panier-overlay {
+            display: none; position: fixed; top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.5); z-index: 1040;
+        }
+        .panier-sidebar {
+            position: fixed; top:0; right:-450px; width:420px; height:100vh;
+            background: white; z-index: 1050; transition: right 0.3s ease;
+            display: flex; flex-direction:column;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+        }
+        .panier-sidebar.ouvert { right: 0; }
+        .panier-header {
+            background: linear-gradient(135deg, #064e3b, #16a34a);
+            color: white; padding: 20px;
+            display: flex; justify-content:space-between; align-items:center;
+        }
+        .panier-body { flex:1; overflow-y:auto; padding:20px; }
+        .panier-footer { padding:20px; border-top:2px solid #f0fdf4; background:#fafafa; }
+        .panier-item {
+            background: #f9fafb; border-radius:12px;
+            padding: 15px; margin-bottom:12px; border: 1px solid #e5e7eb;
+        }
+        .total-box {
+            background: linear-gradient(135deg, #064e3b, #16a34a);
+            color:white; border-radius:12px; padding:15px 20px; margin-bottom:15px;
+        }
+        .btn-valider {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border:none; color:white; padding:14px; border-radius:12px;
+            font-weight:700; font-size:1rem; width:100%; cursor:pointer;
+        }
+        .btn-valider:hover { opacity:0.9; }
+        .btn-vider { background:#f3f4f6; border:none; color:#6b7280; padding:10px; border-radius:10px; width:100%; margin-top:8px; cursor:pointer; }
+        .qte-btn {
+            width:28px; height:28px; border-radius:50%;
+            border:2px solid #16a34a; background:white; color:#16a34a;
+            font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center;
+        }
+        .qte-btn:hover { background:#16a34a; color:white; }
+        .montant-total-display { font-size:2.5rem; font-weight:800; color:#16a34a; }
+        .monnaie-display { font-size:1.8rem; font-weight:700; color:#f59e0b; }
+        .monnaie-display.negatif { color:#dc2626; }
+        .filtre-btn { border-radius:20px; padding:6px 16px; border:2px solid #16a34a; color:#16a34a; background:white; cursor:pointer; transition:all 0.2s; }
+        .filtre-btn.actif, .filtre-btn:hover { background:#16a34a; color:white; }
+        .badge-promo { font-size:0.75rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar-boutique d-flex justify-content-between align-items-center mb-4">
+    <a href="/" class="brand">
+        <img src="/images/logo-small.png" style="width:35px;height:35px;object-fit:cover;border-radius:8px;margin-right:8px;vertical-align:middle;">
+        Fresh Market — Boutique
+    </a>
+    <div class="d-flex align-items-center gap-3">
+        <a href="/auth/login" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-in-right me-1"></i>Espace Staff</a>
+        <button class="btn-panier btn" onclick="ouvrirPanier()">
+            <i class="bi bi-cart3 me-2"></i>Panier
+            <span class="panier-badge" id="badge-panier">0</span>
+        </button>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold" style="color:#064e3b;">🛒 Nos Produits Alimentaires</h1>
+        <p class="text-muted fs-5">Qualité et fraîcheur garanties — Paiement en espèces</p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        <button class="filtre-btn actif" onclick="filtrer('tous', this)">Tous</button>
+        <% categories.forEach(c => { %>
+            <button class="filtre-btn" onclick="filtrer('<%= c.id %>', this)"><%= c.nom %></button>
+        <% }) %>
+    </div>
+
+    <div class="row g-4" id="liste-produits">
+        <% if (produits.length === 0) { %>
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                <p class="text-muted fs-5">Aucun produit disponible.</p>
+            </div>
+        <% } %>
+        <% produits.forEach(p => { %>
+        <% var prixFinal = p.prix_promo ? parseFloat(p.prix_promo) : parseFloat(p.prix); %>
+        <div class="col-lg-3 col-md-4 col-sm-6 produit-item" data-categorie="<%= p.categorie_id %>">
+            <div class="produit-card">
+                <% if (p.image) { %>
+                    <img src="<%= p.image %>" class="produit-img" alt="<%= p.nom %>">
+                <% } else { %>
+                    <div class="produit-img-placeholder">
+                        <i class="bi bi-basket2 text-success" style="font-size:4rem;"></i>
+                    </div>
+                <% } %>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h6 class="fw-bold mb-0"><%= p.nom %></h6>
+                        <span class="badge bg-warning text-dark" style="font-size:0.7rem;">Stock: <%= p.quantite_stock %></span>
+                    </div>
+                    <% if (p.categorie_nom) { %>
+                        <small class="text-muted"><i class="bi bi-tag me-1"></i><%= p.categorie_nom %></small>
+                    <% } %>
+                    <% if (p.description) { %>
+                        <p class="text-muted small mt-2 mb-2" style="line-height:1.4;">
+                            <%= p.description.substring(0, 60) %><%= p.description.length > 60 ? '...' : '' %>
+                        </p>
+                    <% } %>
+                    <% if (p.promo_valeur) { %>
+                        <div class="my-2">
+                            <span class="badge bg-danger badge-promo"><i class="bi bi-percent me-1"></i><%= p.promo_nom %></span><br>
+                            <span class="prix-barre"><%= parseFloat(p.prix).toLocaleString('fr-FR') %> FCFA</span>
+                            <span class="prix ms-2"><%= prixFinal.toLocaleString('fr-FR') %> FCFA</span>
+                        </div>
+                    <% } else { %>
+                        <div class="prix my-2"><%= parseFloat(p.prix).toLocaleString('fr-FR') %> FCFA</div>
+                    <% } %>
+                    <button class="btn-ajouter"
+                            onclick="ajouterAuPanier(<%= p.id %>, '<%= p.nom.replace(/'/g, "\\'") %>', <%= prixFinal %>, <%= p.quantite_stock %>)"
+                            id="btn-<%= p.id %>">
+                        <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
+                    </button>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+</div>
+
+<div class="panier-overlay" id="panier-overlay" onclick="fermerPanier()"></div>
+
+<div class="panier-sidebar" id="panier-sidebar">
+    <div class="panier-header">
+        <h5 class="mb-0"><i class="bi bi-cart3 me-2"></i>Mon Panier</h5>
+        <button onclick="fermerPanier()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="panier-body" id="panier-body">
+        <div class="text-center py-5 text-muted" id="panier-vide">
+            <i class="bi bi-cart3 d-block fs-1 mb-3"></i>
+            <p>Votre panier est vide</p>
+        </div>
+        <div id="panier-items"></div>
+    </div>
+    <div class="panier-footer" id="panier-footer" style="display:none;">
+        <div class="total-box">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fs-5">Total :</span>
+                <span class="fs-4 fw-bold" id="total-panier">0 FCFA</span>
+            </div>
+        </div>
+        <button class="btn-valider" onclick="ouvrirPaiement()">
+            <i class="bi bi-cash-coin me-2"></i>Payer en espèces
+        </button>
+        <button class="btn-vider" onclick="viderPanier()">
+            <i class="bi bi-trash me-2"></i>Vider le panier
+        </button>
+    </div>
+</div>
+
+<!-- Modal Paiement -->
+<div class="modal fade" id="modalPaiement" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#064e3b,#16a34a); color:white;">
+                <h5 class="modal-title"><i class="bi bi-cash-coin me-2"></i>Paiement en Espèces</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="text-muted mb-1">Montant total à payer</div>
+                    <div class="montant-total-display" id="modal-total">0 FCFA</div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold fs-5">Montant reçu (FCFA)</label>
+                    <input type="number" id="montant-recu" class="form-control form-control-lg text-center fw-bold"
+                           placeholder="Entrez le montant" min="0" step="1" oninput="calculerMonnaie()">
+                </div>
+                <div class="text-center mb-4">
+                    <div class="text-muted mb-1">Monnaie à rendre</div>
+                    <div class="monnaie-display" id="modal-monnaie">— FCFA</div>
+                </div>
+                <button class="btn-valider" id="btn-confirmer" onclick="confirmerPaiement()" disabled>
+                    <i class="bi bi-check-circle-fill me-2"></i>Confirmer le paiement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Recu -->
+<div class="modal fade" id="modalRecu" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#16a34a,#064e3b); color:white;">
+                <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i>Paiement Confirmé !</h5>
+            </div>
+            <div class="modal-body p-4">
+                <div id="recu-contenu" style="background:#f0fdf4;border-radius:12px;padding:20px;border:2px solid #16a34a;"></div>
+                <button class="btn-valider mt-3" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i>Imprimer le reçu
+                </button>
+                <button class="btn-vider mt-2" data-bs-dismiss="modal" onclick="viderPanier()">
+                    <i class="bi bi-arrow-left me-2"></i>Continuer les achats
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let panier = {};
+
+function ajouterAuPanier(id, nom, prix, stockMax) {
+    if (panier[id]) {
+        if (panier[id].qte >= stockMax) { alert('Stock maximum : ' + stockMax); return; }
+        panier[id].qte++;
+    } else {
+        panier[id] = { nom, prix: parseFloat(prix), qte: 1, stockMax };
+    }
+    renderPanier();
+    const btn = document.getElementById('btn-' + id);
+    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Ajouté !';
+    btn.style.background = '#064e3b';
+    setTimeout(() => {
+        btn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Ajouter au panier';
+        btn.style.background = '';
+    }, 1000);
+}
+
+function changerQte(id, val) {
+    const newQte = parseInt(val);
+    if (newQte <= 0) delete panier[id];
+    else if (newQte > panier[id].stockMax) { alert('Stock max: ' + panier[id].stockMax); return; }
+    else panier[id].qte = newQte;
+    renderPanier();
+}
+
+function retirerDuPanier(id) { delete panier[id]; renderPanier(); }
+
+function renderPanier() {
+    const items = Object.entries(panier);
+    const badge = document.getElementById('badge-panier');
+    const panierVide = document.getElementById('panier-vide');
+    const panierItems = document.getElementById('panier-items');
+    const panierFooter = document.getElementById('panier-footer');
+    const totalItems = items.reduce((s, [, i]) => s + i.qte, 0);
+    badge.textContent = totalItems;
+
+    if (items.length === 0) {
+        panierVide.style.display = 'block';
+        panierItems.innerHTML = '';
+        panierFooter.style.display = 'none';
+        return;
+    }
+
+    panierVide.style.display = 'none';
+    panierFooter.style.display = 'block';
+
+    let total = 0;
+    let html = '';
+    items.forEach(([id, item]) => {
+        const sous = item.prix * item.qte;
+        total += sous;
+        html += `<div class="panier-item">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="fw-bold">${item.nom}</div>
+                <button onclick="retirerDuPanier(${id})" style="background:none;border:none;color:#dc2626;cursor:pointer;">
+                    <i class="bi bi-x-circle-fill"></i>
+                </button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="qte-btn" onclick="changerQte(${id}, ${item.qte - 1})">-</button>
+                    <span class="fw-bold">${item.qte}</span>
+                    <button class="qte-btn" onclick="changerQte(${id}, ${item.qte + 1})">+</button>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">${item.prix.toLocaleString('fr-FR')} × ${item.qte}</small><br>
+                    <span style="color:#16a34a;font-weight:700;">${sous.toLocaleString('fr-FR')} FCFA</span>
+                </div>
+            </div>
+        </div>`;
+    });
+    panierItems.innerHTML = html;
+    document.getElementById('total-panier').textContent = total.toLocaleString('fr-FR') + ' FCFA';
+    calculerMonnaie();
+}
+
+function ouvrirPanier() {
+    document.getElementById('panier-sidebar').classList.add('ouvert');
+    document.getElementById('panier-overlay').style.display = 'block';
+}
+function fermerPanier() {
+    document.getElementById('panier-sidebar').classList.remove('ouvert');
+    document.getElementById('panier-overlay').style.display = 'none';
+}
+function viderPanier() { panier = {}; renderPanier(); fermerPanier(); }
+
+function ouvrirPaiement() {
+    const total = Object.values(panier).reduce((s, i) => s + i.prix * i.qte, 0);
+    document.getElementById('modal-total').textContent = total.toLocaleString('fr-FR') + ' FCFA';
+    document.getElementById('montant-recu').value = '';
+    document.getElementById('modal-monnaie').textContent = '— FCFA';
+    document.getElementById('btn-confirmer').disabled = true;
+    fermerPanier();
+    new bootstrap.Modal(document.getElementById('modalPaiement')).show();
+}
+
+function calculerMonnaie() {
+    const total = Object.values(panier).reduce((s, i) => s + i.prix * i.qte, 0);
+    const recu = parseFloat(document.getElementById('montant-recu').value) || 0;
+    const monnaie = recu - total;
+    const el = document.getElementById('modal-monnaie');
+    el.textContent = monnaie.toLocaleString('fr-FR') + ' FCFA';
+    el.className = monnaie < 0 ? 'monnaie-display negatif' : 'monnaie-display';
+    document.getElementById('btn-confirmer').disabled = monnaie < 0 || Object.keys(panier).length === 0;
+}
+
+async function confirmerPaiement() {
+    const items = Object.entries(panier);
+    const montant_recu = document.getElementById('montant-recu').value;
+    const payload = {
+        montant_recu: parseFloat(montant_recu),
+        produit_ids: items.map(([id]) => id),
+        quantites: items.map(([, i]) => i.qte),
+        prix_unitaires: items.map(([, i]) => i.prix)
+    };
+    try {
+        const response = await fetch('/valider-achat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalPaiement')).hide();
+            let recuHtml = `<div class="text-center mb-3">
+                <i class="bi bi-check-circle-fill text-success d-block fs-1 mb-2"></i>
+                <h5 class="fw-bold text-success">Paiement réussi !</h5>
+                <small class="text-muted">Réf: ${data.reference}</small>
+            </div><hr><h6 class="fw-bold">Articles :</h6>`;
+            data.lignes.forEach(l => {
+                recuHtml += `<div class="d-flex justify-content-between mb-1">
+                    <span>${l.nom} × ${l.quantite}</span>
+                    <strong>${parseFloat(l.sous_total).toLocaleString('fr-FR')} FCFA</strong>
+                </div>`;
+            });
+            recuHtml += `<hr>
+                <div class="d-flex justify-content-between fw-bold fs-5">
+                    <span>Total</span><span class="text-success">${parseFloat(data.montant_total).toLocaleString('fr-FR')} FCFA</span>
+                </div>
+                <div class="d-flex justify-content-between mt-1" style="color:#f59e0b;">
+                    <span>💰 Monnaie rendue</span>
+                    <span>${parseFloat(data.monnaie_rendue).toLocaleString('fr-FR')} FCFA</span>
+                </div>
+                <div class="text-center mt-3 text-muted small">Merci pour votre achat ! 🎉</div>`;
+            document.getElementById('recu-contenu').innerHTML = recuHtml;
+            new bootstrap.Modal(document.getElementById('modalRecu')).show();
+            viderPanier();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (err) {
+        alert('Erreur de connexion');
+    }
+}
+
+function filtrer(categorieId, btn) {
+    document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
+    btn.classList.add('actif');
+    document.querySelectorAll('.produit-item').forEach(el => {
+        el.style.display = categorieId === 'tous' || el.dataset.categorie == categorieId ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

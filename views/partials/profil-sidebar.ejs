@@ -1,0 +1,19 @@
+<div class="brand">
+    <div class="text-center mb-3">
+        <% if (user && user.photo) { %>
+            <img src="<%= user.photo %>"
+                 style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.5);"
+                 class="mb-2">
+        <% } else { %>
+            <div style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+                <i class="bi bi-person-fill text-white" style="font-size:2rem;"></i>
+            </div>
+        <% } %>
+        <div class="text-white fw-bold"><%= user ? user.prenom + ' ' + user.nom : '' %></div>
+        <small style="color:rgba(255,255,255,0.7);font-size:0.75rem;"><%= user ? user.role.replace(/_/g,' ') : '' %></small>
+    </div>
+
+    <h6 class="text-center" style="color:rgba(255,255,255,0.5);font-size:0.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px;">
+        <img src="/images/logo-small.png" style="width:25px;height:25px;object-fit:cover;border-radius:5px;margin-right:5px;">Fresh Market
+    </h6>
+</div>

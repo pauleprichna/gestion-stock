@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-catalogue') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-box-seam me-2"></i><%= produit ? 'Modifier' : 'Nouveau' %> Produit</h4>
+        <a href="/catalogue/produits" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Retour</a>
+    </div>
+    <div class="card" style="max-width:600px;">
+        <div class="card-header" style="background:#064e3b; color:white;">
+            <i class="bi bi-box-seam me-2"></i>Informations du produit
+        </div>
+        <div class="card-body p-4">
+            <form action="<%= produit ? '/catalogue/produits/' + produit.id + '/modifier' : '/catalogue/produits' %>" 
+                  method="POST">
+                
+                <input type="hidden" name="image_base64" id="image_base64" value="<%= produit && produit.image ? produit.image : '' %>">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Image du produit</label>
+                    <% if (produit && produit.image && produit.image.startsWith('data:')) { %>
+                        <div class="mb-2">
+                            <img src="<%= produit.image %>" style="width:100px;height:100px;object-fit:cover;border-radius:10px;" id="preview">
+                        </div>
+                    <% } else { %>
+                        <div class="mb-2">
+                            <img id="preview" style="width:100px;height:100px;object-fit:cover;border-radius:10px;display:none;">
+                        </div>
+                    <% } %>
+                    <input type="file" class="form-control" accept="image/*" id="imageInput">
+                    <small class="text-muted">L'image sera convertie automatiquement</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nom *</label>
+                    <input type="text" name="nom" class="form-control" value="<%= produit ? produit.nom : '' %>" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea name="description" class="form-control" rows="3"><%= produit ? produit.description || '' : '' %></textarea>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Prix (FCFA) *</label>
+                        <input type="number" name="prix" class="form-control" min="0" value="<%= produit ? produit.prix : '' %>" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Stock initial</label>
+                        <input type="number" name="quantite_stock" class="form-control" min="0" value="<%= produit ? produit.quantite_stock : 0 %>">
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Seuil alerte</label>
+                        <input type="number" name="seuil_alerte" class="form-control" min="0" value="<%= produit ? produit.seuil_alerte : 5 %>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Catégorie</label>
+                        <select name="categorie_id" class="form-select">
+                            <option value="">-- Aucune --</option>
+                            <% categories.forEach(c => { %>
+                                <option value="<%= c.id %>" <%= produit && produit.categorie_id === c.id ? 'selected' : '' %>><%= c.nom %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-3">
+                    <i class="bi bi-check-lg me-2"></i><%= produit ? 'Enregistrer' : 'Créer le produit' %>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        document.getElementById('image_base64').value = base64;
+        document.getElementById('preview').src = base64;
+        document.getElementById('preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+</script>
+</body>
+</html>

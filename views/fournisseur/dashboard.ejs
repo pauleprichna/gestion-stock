@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-fournisseur') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-speedometer2 me-2"></i>Tableau de bord — Fournisseur</h4>
+        <span class="badge" style="background:#0e7490; padding:8px 15px; border-radius:20px;">
+            <i class="bi bi-truck me-1"></i>Fournisseur
+        </span>
+    </div>
+    <% if (success && success.length > 0) { %><div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i><%= success %></div><% } %>
+    <% if (error && error.length > 0) { %><div class="alert alert-danger"><i class="bi bi-exclamation-circle-fill me-2"></i><%= error %></div><% } %>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card" style="background:linear-gradient(135deg,#0891b2,#0e7490);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.commandes || 0 %></div><div>Total commandes</div></div>
+                    <i class="bi bi-truck stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.enAttente || 0 %></div><div>En attente de livraison</div></div>
+                    <i class="bi bi-hourglass-split stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#15803d);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.livrees || 0 %></div><div>Livrées</div></div>
+                    <i class="bi bi-check-circle-fill stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="background:#064e3b; color:white;">
+            <i class="bi bi-lightning-charge-fill me-2"></i>Accès rapides
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <a href="/fournisseur/commandes" class="btn w-100 py-4 text-white fw-bold" 
+                       style="background:linear-gradient(135deg,#f59e0b,#d97706); border:none; border-radius:12px;">
+                        <i class="bi bi-truck d-block fs-2 mb-2"></i>
+                        Voir & Fournir commandes
+                        <% if (parseInt(stats.enAttente) > 0) { %>
+                        <span class="badge bg-danger ms-2"><%= stats.enAttente %></span>
+                        <% } %>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/fournisseur/gestionnaire-stock" class="btn btn-outline-secondary w-100 py-4" style="border-radius:12px;">
+                        <i class="bi bi-person-badge d-block fs-2 mb-2"></i>Consulter Gestionnaire Stock
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

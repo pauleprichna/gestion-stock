@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-admin') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-boxes me-2"></i>État du Stock</h4>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#15803d);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.total || 0 %></div><div>Total produits</div></div>
+                    <i class="bi bi-box-seam stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#065f46);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.normal || 0 %></div><div>Stock normal</div></div>
+                    <i class="bi bi-check-circle-fill stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.en_alerte || 0 %></div><div>En alerte</div></div>
+                    <i class="bi bi-exclamation-triangle-fill stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><div class="stat-number"><%= stats.rupture || 0 %></div><div>Rupture totale</div></div>
+                    <i class="bi bi-x-circle-fill stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead style="background:#064e3b; color:white;">
+                    <tr>
+                        <th class="px-4 py-3">Produit</th>
+                        <th>Catégorie</th>
+                        <th>Quantité disponible</th>
+                        <th>Seuil alerte</th>
+                        <th>État du stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% produits.forEach(p => { %>
+                    <tr>
+                        <td class="px-4 fw-semibold"><i class="bi bi-basket2 me-2 text-success"></i><%= p.nom %></td>
+                        <td><span class="badge bg-warning text-dark"><%= p.categorie_nom || 'Non catégorisé' %></span></td>
+                        <td><strong><%= p.quantite_stock %></strong></td>
+                        <td><%= p.seuil_alerte %></td>
+                        <td>
+                            <% if (p.quantite_stock === 0) { %>
+                                <span class="badge bg-dark"><i class="bi bi-x-circle me-1"></i>Rupture totale</span>
+                            <% } else if (p.quantite_stock <= p.seuil_alerte) { %>
+                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>En alerte</span>
+                            <% } else { %>
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Normal</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-admin') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-gear-fill me-2"></i>Paramètres Système</h4>
+    </div>
+
+    <% if (success && success.length > 0) { %><div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i><%= success %></div><% } %>
+    <% if (error && error.length > 0) { %><div class="alert alert-danger"><i class="bi bi-exclamation-circle-fill me-2"></i><%= error %></div><% } %>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card text-center p-4">
+                <img src="/images/logo.jpeg" style="width:120px;height:120px;object-fit:cover;border-radius:15px;margin:0 auto 15px;" onerror="this.src='/images/logo-small.png'">
+                <h5 class="fw-bold"><%= config.nom_entreprise || 'Fresh Market' %></h5>
+                <p class="text-muted fst-italic"><%= config.slogan || '' %></p>
+                <hr>
+                <div class="text-start">
+                    <div class="d-flex gap-2 mb-2">
+                        <i class="bi bi-geo-alt-fill text-success mt-1"></i>
+                        <span><%= config.adresse || '—' %></span>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <i class="bi bi-telephone-fill text-success mt-1"></i>
+                        <span><%= config.telephone || '—' %></span>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <i class="bi bi-envelope-fill text-success mt-1"></i>
+                        <span><%= config.email || '—' %></span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <i class="bi bi-cash-coin text-success mt-1"></i>
+                        <span>Devise : <strong><%= config.devise || 'FCFA' %></strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background:#064e3b; color:white;">
+                    <i class="bi bi-pencil-fill me-2"></i>Modifier les paramètres
+                </div>
+                <div class="card-body p-4">
+                    <form action="/admin/parametres" method="POST" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Nom de l'entreprise *</label>
+                                <input type="text" name="nom_entreprise" class="form-control"
+                                       value="<%= config.nom_entreprise || '' %>" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Slogan</label>
+                                <input type="text" name="slogan" class="form-control"
+                                       value="<%= config.slogan || '' %>"
+                                       placeholder="Ex: Qualité et fraîcheur garanties">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Adresse</label>
+                                <input type="text" name="adresse" class="form-control"
+                                       value="<%= config.adresse || '' %>"
+                                       placeholder="Ex: Dakar, Sénégal">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Téléphone</label>
+                                <input type="tel" name="telephone" class="form-control"
+                                       value="<%= config.telephone || '' %>"
+                                       placeholder="Ex: 77 000 00 00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" name="email" class="form-control"
+                                       value="<%= config.email || '' %>"
+                                       placeholder="Ex: contact@freshmarket.sn">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Logo de l'entreprise</label>
+                                <input type="file" name="logo" class="form-control" accept="image/*">
+                                <small class="text-muted">Laissez vide pour garder le logo actuel</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Devise</label>
+                                <select name="devise" class="form-select">
+                                    <option value="FCFA" <%= config.devise === 'FCFA' ? 'selected' : '' %>>FCFA</option>
+                                    <option value="EUR" <%= config.devise === 'EUR' ? 'selected' : '' %>>EUR</option>
+                                    <option value="USD" <%= config.devise === 'USD' ? 'selected' : '' %>>USD</option>
+                                    <option value="XOF" <%= config.devise === 'XOF' ? 'selected' : '' %>>XOF</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-primary px-5 py-2">
+                                    <i class="bi bi-check-lg me-2"></i>Enregistrer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

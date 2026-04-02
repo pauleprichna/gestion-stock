@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-stock') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-people-fill me-2"></i>Consulter les Fournisseurs</h4>
+        <span class="badge bg-success px-3 py-2"><%= fournisseurs.length %> fournisseur(s)</span>
+    </div>
+    <% if (fournisseurs.length === 0) { %>
+        <div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>Aucun fournisseur enregistré. L'administrateur doit créer des comptes fournisseurs.</div>
+    <% } else { %>
+    <div class="row g-4">
+        <% fournisseurs.forEach(f => { %>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width:55px;height:55px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#064e3b);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-person-fill text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold"><%= f.prenom %> <%= f.nom %></h6>
+                            <small class="text-muted"><%= f.email %></small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Commandes passées</span>
+                        <span class="badge bg-success px-3"><%= f.nb_commandes %></span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="text-muted">Statut</span>
+                        <span class="badge <%= f.actif ? 'bg-success' : 'bg-secondary' %>"><%= f.actif ? 'Actif' : 'Inactif' %></span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="text-muted">Membre depuis</span>
+                        <span><%= new Date(f.date_creation).toLocaleDateString('fr-FR') %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+    <% } %>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

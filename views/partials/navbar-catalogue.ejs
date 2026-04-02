@@ -1,0 +1,20 @@
+<div class="sidebar" style="display:flex;flex-direction:column;height:100vh;">
+    <%- include('profil-sidebar') %>
+    <nav class="nav flex-column" style="flex:1;overflow-y:auto;">
+        <a href="/catalogue/dashboard" class="nav-link <%= title.includes('Dashboard') ? 'active' : '' %>">
+            <i class="bi bi-speedometer2"></i> Tableau de bord</a>
+        <a href="/catalogue/categories" class="nav-link <%= title.includes('Catégorie') ? 'active' : '' %>">
+            <i class="bi bi-tags-fill"></i> Catégories</a>
+        <a href="/catalogue/produits" class="nav-link <%= title.includes('Produit') ? 'active' : '' %>">
+            <i class="bi bi-box-seam"></i> Produits</a>
+        <a href="/catalogue/promotions" class="nav-link <%= title.includes('Promotion') ? 'active' : '' %>">
+            <i class="bi bi-percent"></i> Promotions</a>
+        <a href="/profil" class="nav-link <%= title.includes('Profil') ? 'active' : '' %>">
+            <i class="bi bi-person-gear"></i> Mon profil</a>
+    </nav>
+    <div style="padding:10px 20px;border-top:1px solid rgba(255,255,255,0.1);">
+        <a href="/auth/logout" class="nav-link logout-btn">
+            <i class="bi bi-box-arrow-left"></i> Déconnexion
+        </a>
+    </div>
+</div>

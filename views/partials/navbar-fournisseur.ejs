@@ -1,0 +1,15 @@
+<div class="sidebar">
+    <%- include('profil-sidebar') %>
+    <nav class="nav flex-column">
+        <a href="/fournisseur/dashboard" class="nav-link <%= title.includes('Dashboard') ? 'active' : '' %>">
+            <i class="bi bi-speedometer2"></i> Tableau de bord</a>
+        <a href="/fournisseur/commandes" class="nav-link <%= title.includes('Commande') ? 'active' : '' %>">
+            <i class="bi bi-truck"></i> Mes Commandes</a>
+        <a href="/fournisseur/gestionnaire-stock" class="nav-link <%= title.includes('Gestionnaire') ? 'active' : '' %>">
+            <i class="bi bi-person-badge"></i> Gestionnaire Stock</a>
+        <a href="/profil" class="nav-link <%= title.includes('Profil') ? 'active' : '' %>">
+            <i class="bi bi-person-gear"></i> Mon profil</a>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:10px 20px;">
+        <a href="/auth/logout" class="nav-link logout-btn"><i class="bi bi-box-arrow-left"></i> Déconnexion</a>
+    </nav>
+</div>

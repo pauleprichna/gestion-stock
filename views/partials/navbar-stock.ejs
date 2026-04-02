@@ -1,0 +1,29 @@
+<div class="sidebar" style="overflow-y:auto; display:flex; flex-direction:column;">
+    <%- include('profil-sidebar') %>
+    <nav class="nav flex-column" style="flex:1; overflow-y:auto; padding-bottom:10px;">
+        <a href="/stock/dashboard" class="nav-link <%= title.includes('Dashboard') ? 'active' : '' %>">
+            <i class="bi bi-speedometer2"></i> Tableau de bord</a>
+        <a href="/stock/voir-stock" class="nav-link <%= title.includes('Voir le Stock') ? 'active' : '' %>">
+            <i class="bi bi-eye-fill"></i> Voir le stock</a>
+        <a href="/stock/mouvements" class="nav-link <%= title.includes('Mouvement') ? 'active' : '' %>">
+            <i class="bi bi-arrow-left-right"></i> Entrée & Sortie</a>
+        <a href="/stock/commandes" class="nav-link <%= title.includes('Commande') ? 'active' : '' %>">
+            <i class="bi bi-cart-fill"></i> Commandes appro</a>
+        <a href="/stock/alertes" class="nav-link <%= title.includes('Alerte') ? 'active' : '' %>">
+            <i class="bi bi-exclamation-triangle-fill"></i> Alertes Stock</a>
+        <a href="/stock/fournisseurs" class="nav-link <%= title.includes('Fournisseur') ? 'active' : '' %>">
+            <i class="bi bi-people-fill"></i> Fournisseurs</a>
+
+        <a href="/stock/historique-ventes" class="nav-link <%= title.includes('Historique') ? 'active' : '' %>">
+            <i class="bi bi-clock-history"></i> Historique ventes</a>
+        <a href="/stock/rapport" class="nav-link <%= title.includes('Rapport') ? 'active' : '' %>">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i> Rapport</a>
+        <a href="/profil" class="nav-link <%= title.includes('Profil') ? 'active' : '' %>">
+            <i class="bi bi-person-gear"></i> Mon profil</a>
+    </nav>
+    <div style="padding:10px 20px; border-top:1px solid rgba(255,255,255,0.1);">
+        <a href="/auth/logout" class="nav-link logout-btn">
+            <i class="bi bi-box-arrow-left"></i> Déconnexion
+        </a>
+    </div>
+</div>

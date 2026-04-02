@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-stock') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-cart-fill me-2"></i>Commandes d'Approvisionnement</h4>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCommande">
+            <i class="bi bi-plus-lg me-2"></i>Nouvelle Commande
+        </button>
+    </div>
+    <% if (success && success.length > 0) { %><div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i><%= success %></div><% } %>
+    <% if (error && error.length > 0) { %><div class="alert alert-danger"><i class="bi bi-exclamation-circle-fill me-2"></i><%= error %></div><% } %>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead style="background:#064e3b; color:white;">
+                    <tr>
+                        <th class="px-4 py-3">Référence</th>
+                        <th>Fournisseur</th>
+                        <th>Statut</th>
+                        <th>Date commande</th>
+                        <th>Livraison prévue</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% if (commandes.length === 0) { %>
+                    <tr><td colspan="6" class="text-center p-5 text-muted"><i class="bi bi-inbox fs-2 d-block mb-2"></i>Aucune commande</td></tr>
+                <% } %>
+                <% commandes.forEach(c => { %>
+                    <% const sc = { en_attente:'warning', confirmee:'primary', livree:'success', annulee:'secondary' }; %>
+                    <tr>
+                        <td class="px-4 fw-semibold"><%= c.reference %></td>
+                        <td><%= c.fournisseur_prenom ? c.fournisseur_prenom + ' ' + c.fournisseur_nom : '—' %></td>
+                        <td><span class="badge bg-<%= sc[c.statut] || 'secondary' %>"><%= c.statut.replace('_',' ') %></span></td>
+                        <td><%= new Date(c.date_commande).toLocaleDateString('fr-FR') %></td>
+                        <td><%= c.date_livraison_prevue ? new Date(c.date_livraison_prevue).toLocaleDateString('fr-FR') : '—' %></td>
+                        <td class="text-center">
+                            <% if (c.statut === 'en_attente') { %>
+                            <form action="/stock/commandes/<%= c.id %>/annuler?_method=PUT" method="POST" class="d-inline" onsubmit="return confirm('Annuler cette commande ?')">
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                            </form>
+                            <% } else { %>
+                                <span class="text-muted">—</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nouvelle Commande -->
+<div class="modal fade" id="modalCommande" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#064e3b; color:white;">
+                <h5 class="modal-title"><i class="bi bi-cart-plus me-2"></i>Nouvelle Commande d'Approvisionnement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/stock/commandes" method="POST" id="formCommande">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Fournisseur *</label>
+                            <select name="fournisseur_id" class="form-select" required>
+                                <option value="">-- Choisir un fournisseur --</option>
+                                <% fournisseurs.forEach(f => { %><option value="<%= f.id %>"><%= f.prenom %> <%= f.nom %></option><% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Date livraison prévue</label>
+                            <input type="date" name="date_livraison_prevue" class="form-control">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 fw-bold">Produits à commander</h6>
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="ajouterLigne()"><i class="bi bi-plus-lg me-1"></i>Ajouter produit</button>
+                    </div>
+                    <div id="lignesProduits">
+                        <div class="row g-2 mb-2 ligne-produit">
+                            <div class="col-md-5">
+                                <select name="produit_ids" class="form-select" required>
+                                    <option value="">-- Produit --</option>
+                                    <% produits.forEach(p => { %><option value="<%= p.id %>" data-prix="<%= p.prix %>"><%= p.nom %></option><% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-3"><input type="number" name="quantites" class="form-control" placeholder="Quantité" min="1" required></div>
+                            <div class="col-md-3"><input type="number" name="prix_unitaires" class="form-control" placeholder="Prix unitaire" min="0" step="1" required></div>
+                            <div class="col-md-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.ligne-produit').remove()"><i class="bi bi-trash"></i></button></div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-3"><i class="bi bi-check me-2"></i>Créer la commande</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const produits = <%- JSON.stringify(produits) %>;
+function ajouterLigne() {
+    const opts = produits.map(p => `<option value="${p.id}" data-prix="${p.prix}">${p.nom}</option>`).join('');
+    const ligne = `<div class="row g-2 mb-2 ligne-produit">
+        <div class="col-md-5"><select name="produit_ids" class="form-select" required><option value="">-- Produit --</option>${opts}</select></div>
+        <div class="col-md-3"><input type="number" name="quantites" class="form-control" placeholder="Quantité" min="1" required></div>
+        <div class="col-md-3"><input type="number" name="prix_unitaires" class="form-control" placeholder="Prix unitaire" min="0" step="1" required></div>
+        <div class="col-md-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.ligne-produit').remove()"><i class="bi bi-trash"></i></button></div>
+    </div>`;
+    document.getElementById('lignesProduits').insertAdjacentHTML('beforeend', ligne);
+}
+</script>
+</body>
+</html>

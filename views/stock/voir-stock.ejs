@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-stock') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-eye-fill me-2"></i>Stock des Produits Alimentaires</h4>
+        <span class="badge bg-success px-3 py-2"><i class="bi bi-box-seam me-1"></i><%= produits.length %> produits</span>
+    </div>
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead style="background:#064e3b; color:white;">
+                    <tr>
+                        <th class="px-4 py-3">Produit</th>
+                        <th>Catégorie</th>
+                        <th>Prix unitaire</th>
+                        <th>Quantité en stock</th>
+                        <th>Seuil alerte</th>
+                        <th>État</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% produits.forEach(p => { %>
+                    <tr>
+                        <td class="px-4 fw-semibold"><i class="bi bi-basket2 me-2 text-success"></i><%= p.nom %></td>
+                        <td><span class="badge bg-warning text-dark"><%= p.categorie_nom || 'Non catégorisé' %></span></td>
+                        <td><strong><%= parseFloat(p.prix).toLocaleString('fr-FR') %> FCFA</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:8px;">
+                                    <div class="progress-bar <%= p.quantite_stock <= p.seuil_alerte ? 'bg-danger' : 'bg-success' %>"
+                                         style="width:<%= Math.min((p.quantite_stock / (p.seuil_alerte * 3)) * 100, 100) %>%"></div>
+                                </div>
+                                <strong><%= p.quantite_stock %></strong>
+                            </div>
+                        </td>
+                        <td><%= p.seuil_alerte %></td>
+                        <td>
+                            <% if (p.quantite_stock === 0) { %>
+                                <span class="badge bg-dark"><i class="bi bi-x-circle me-1"></i>Rupture</span>
+                            <% } else if (p.quantite_stock <= p.seuil_alerte) { %>
+                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Critique</span>
+                            <% } else { %>
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Disponible</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

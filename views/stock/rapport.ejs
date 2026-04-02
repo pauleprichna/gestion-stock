@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %>
+<style>
+    @media print { .sidebar, .topbar, .no-print { display:none !important; } .main-content { margin-left:0 !important; } }
+</style>
+</head>
+<body>
+<%- include('../partials/navbar-stock') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-file-earmark-bar-graph-fill me-2"></i>Rapport de Stock</h4>
+        <button class="btn btn-success no-print" onclick="window.print()"><i class="bi bi-printer me-2"></i>Imprimer</button>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header" style="background:#064e3b; color:white;">
+            <i class="bi bi-info-circle me-2"></i>Résumé général — <%= dateRapport %>
+        </div>
+        <div class="card-body">
+            <div class="row g-4 text-center">
+                <div class="col-md-3">
+                    <div class="stat-card" style="background:linear-gradient(135deg,#16a34a,#15803d);">
+                        <div class="stat-number"><%= produits.length %></div>
+                        <div>Produits total</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+                        <div class="stat-number"><%= alertes %></div>
+                        <div>En alerte</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                        <div class="stat-number"><%= parseFloat(valeurTotale).toLocaleString('fr-FR') %></div>
+                        <div>Valeur totale (FCFA)</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
+                        <% const entree = mouvements.find(m => m.type === 'entree'); const sortie = mouvements.find(m => m.type === 'sortie'); %>
+                        <div class="stat-number"><%= (entree ? entree.total : 0) %> / <%= (sortie ? sortie.total : 0) %></div>
+                        <div>Entrées / Sorties</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="background:#064e3b; color:white;">
+            <i class="bi bi-table me-2"></i>Détail des produits alimentaires
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead style="background:#f0fdf4;">
+                    <tr>
+                        <th class="px-4 py-3">Produit</th>
+                        <th>Catégorie</th>
+                        <th>Prix unitaire</th>
+                        <th>Quantité</th>
+                        <th>Valeur stock</th>
+                        <th>État</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% produits.forEach(p => { %>
+                    <tr>
+                        <td class="px-4 fw-semibold"><%= p.nom %></td>
+                        <td><%= p.categorie_nom || '—' %></td>
+                        <td><%= parseFloat(p.prix).toLocaleString('fr-FR') %> FCFA</td>
+                        <td><strong><%= p.quantite_stock %></strong></td>
+                        <td><%= (p.quantite_stock * parseFloat(p.prix)).toLocaleString('fr-FR') %> FCFA</td>
+                        <td>
+                            <% if (p.quantite_stock === 0) { %>
+                                <span class="badge bg-dark">Rupture</span>
+                            <% } else if (p.quantite_stock <= p.seuil_alerte) { %>
+                                <span class="badge bg-danger">Critique</span>
+                            <% } else { %>
+                                <span class="badge bg-success">OK</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
