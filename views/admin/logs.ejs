@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><%- include('../partials/head') %></head>
+<body>
+<%- include('../partials/navbar-admin') %>
+<div class="main-content">
+    <div class="topbar">
+        <h4><i class="bi bi-journal-text me-2"></i>Logs Système</h4>
+        <span class="badge bg-secondary px-3 py-2"><%= logs.length %> entrée(s)</span>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body p-3">
+            <form action="/admin/logs" method="GET" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Filtrer par action</label>
+                    <select name="action" class="form-select" onchange="this.form.submit()">
+                        <option value="tous">— Toutes les actions —</option>
+                        <% actions.forEach(a => { %>
+                            <option value="<%= a %>" <%= filtreAction === a ? 'selected' : '' %>><%= a.replace(/_/g,' ') %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold">Rechercher</label>
+                    <input type="text" name="recherche" class="form-control"
+                           placeholder="Nom utilisateur, détails..."
+                           value="<%= recherche %>">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-2"></i>Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <% if (logs.length === 0) { %>
+                <div class="text-center p-5 text-muted">
+                    <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
+                    Aucun log trouvé.
+                </div>
+            <% } else { %>
+            <table class="table table-hover mb-0">
+                <thead style="background:#064e3b; color:white;">
+                    <tr>
+                        <th class="px-4 py-3">Date & Heure</th>
+                        <th>Action</th>
+                        <th>Utilisateur</th>
+                        <th>Détails</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% logs.forEach(l => { %>
+                    <tr>
+                        <td class="px-4 text-muted small"><%= l.date %></td>
+                        <td>
+                            <% const colors = {
+                                CONNEXION: 'success', DECONNEXION: 'secondary',
+                                CREATION_UTILISATEUR: 'primary', MODIFICATION_UTILISATEUR: 'warning',
+                                SUPPRESSION_UTILISATEUR: 'danger', MOUVEMENT_STOCK: 'info',
+                                VENTE: 'success', CREATION_COMMANDE: 'primary',
+                                ANNULATION_COMMANDE: 'danger', MODIFICATION_PARAMETRES: 'warning'
+                            }; %>
+                            <span class="badge bg-<%= colors[l.action] || 'secondary' %>" style="font-size:0.75rem;">
+                                <%= l.action.replace(/_/g,' ') %>
+                            </span>
+                        </td>
+                        <td class="fw-semibold"><%= l.utilisateur %></td>
+                        <td class="text-muted small"><%= l.details %></td>
+                        <td class="text-muted small"><%= l.ip %></td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            <% } %>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

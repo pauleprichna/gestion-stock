@@ -1,4 +1,6 @@
 const pool = require('../config/db');
+const path = require('path');
+const fs = require('fs');
 
 exports.upload = (req, res, next) => next();
 
@@ -37,6 +39,19 @@ exports.creerCategorie = async (req, res) => {
     res.redirect('/catalogue/categories');
 };
 
+exports.modifierCategorie = async (req, res) => {
+    const { id } = req.params;
+    const { nom, description } = req.body;
+    try {
+        await pool.query('UPDATE categories SET nom=$1, description=$2 WHERE id=$3',
+            [nom, description || null, id]);
+        req.flash('success', 'Catégorie modifiée');
+    } catch (err) {
+        req.flash('error', 'Erreur modification catégorie');
+    }
+    res.redirect('/catalogue/categories');
+};
+
 exports.supprimerCategorie = async (req, res) => {
     await pool.query('DELETE FROM categories WHERE id=$1', [req.params.id]);
     req.flash('success', 'Catégorie supprimée');
@@ -69,10 +84,25 @@ exports.getFormProduit = async (req, res) => {
 
 exports.creerProduit = async (req, res) => {
     const { nom, description, prix, quantite_stock, seuil_alerte, categorie_id } = req.body;
+    let imagePath = null;
+    if (req.body.image_base64 && req.body.image_base64.startsWith('data:')) {
+        try {
+            const match = req.body.image_base64.match(/^data:image\/(\w+);base64,(.+)$/);
+            if (match) {
+                const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+                const base64Data = match[2];
+                const filename = 'produit-' + Date.now() + '.' + ext;
+                const uploadDir = path.join(__dirname, '../public/images/produits');
+                if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+                fs.writeFileSync(path.join(uploadDir, filename), Buffer.from(base64Data, 'base64'));
+                imagePath = '/images/produits/' + filename;
+            }
+        } catch(e) { console.error('Erreur image:', e); }
+    }
     try {
         await pool.query(
-            'INSERT INTO produits (nom, description, prix, quantite_stock, seuil_alerte, categorie_id, cree_par) VALUES ($1,$2,$3,$4,$5,$6,$7)',
-            [nom, description || null, prix, quantite_stock || 0, seuil_alerte || 5, categorie_id || null, req.session.user.id]
+            'INSERT INTO produits (nom, description, prix, quantite_stock, seuil_alerte, categorie_id, cree_par, image) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+            [nom, description || null, prix, quantite_stock || 0, seuil_alerte || 5, categorie_id || null, req.session.user.id, imagePath]
         );
         req.flash('success', 'Produit créé');
     } catch (err) {
@@ -85,13 +115,36 @@ exports.creerProduit = async (req, res) => {
 exports.modifierProduit = async (req, res) => {
     const { id } = req.params;
     const { nom, description, prix, seuil_alerte, categorie_id } = req.body;
+    let imagePath = null;
+    if (req.body.image_base64 && req.body.image_base64.startsWith('data:')) {
+        try {
+            const match = req.body.image_base64.match(/^data:image\/(\w+);base64,(.+)$/);
+            if (match) {
+                const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+                const base64Data = match[2];
+                const filename = 'produit-' + Date.now() + '.' + ext;
+                const uploadDir = path.join(__dirname, '../public/images/produits');
+                if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+                fs.writeFileSync(path.join(uploadDir, filename), Buffer.from(base64Data, 'base64'));
+                imagePath = '/images/produits/' + filename;
+            }
+        } catch(e) { console.error('Erreur image:', e); }
+    }
     try {
-        await pool.query(
-            'UPDATE produits SET nom=$1, description=$2, prix=$3, seuil_alerte=$4, categorie_id=$5 WHERE id=$6',
-            [nom, description || null, prix, seuil_alerte || 5, categorie_id || null, id]
-        );
+        if (imagePath) {
+            await pool.query(
+                'UPDATE produits SET nom=$1, description=$2, prix=$3, seuil_alerte=$4, categorie_id=$5, image=$6 WHERE id=$7',
+                [nom, description || null, prix, seuil_alerte || 5, categorie_id || null, imagePath, id]
+            );
+        } else {
+            await pool.query(
+                'UPDATE produits SET nom=$1, description=$2, prix=$3, seuil_alerte=$4, categorie_id=$5 WHERE id=$6',
+                [nom, description || null, prix, seuil_alerte || 5, categorie_id || null, id]
+            );
+        }
         req.flash('success', 'Produit modifié');
     } catch (err) {
+        console.error(err);
         req.flash('error', 'Erreur modification');
     }
     res.redirect('/catalogue/produits');
@@ -106,8 +159,6 @@ exports.supprimerProduit = async (req, res) => {
     }
     res.redirect('/catalogue/produits');
 };
-
-// ===================== PROMOTIONS =====================
 
 exports.getPromotions = async (req, res) => {
     try {

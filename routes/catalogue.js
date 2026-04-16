@@ -8,6 +8,7 @@ router.use(autoriser('gestionnaire_catalogue'));
 router.get('/dashboard', ctrl.dashboard);
 router.get('/categories', ctrl.getCategories);
 router.post('/categories', ctrl.creerCategorie);
+router.put('/categories/:id', ctrl.modifierCategorie);
 router.delete('/categories/:id', ctrl.supprimerCategorie);
 router.get('/produits', ctrl.getProduits);
 router.get('/produits/nouveau', ctrl.getFormProduit);

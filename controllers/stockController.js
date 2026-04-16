@@ -274,6 +274,7 @@ exports.getRecu = async (req, res) => {
 };
 
 exports.getHistoriqueVentes = async (req, res) => {
+    
     try {
         const ventes = await pool.query(`
             SELECT v.*, u.nom AS vendeur_nom, u.prenom AS vendeur_prenom,

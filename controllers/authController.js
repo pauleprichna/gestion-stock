@@ -7,7 +7,6 @@ const redirectParRole = (role) => {
         case 'gestionnaire_catalogue': return '/catalogue/dashboard';
         case 'gestionnaire_stock': return '/stock/dashboard';
         case 'fournisseur': return '/fournisseur/dashboard';
-        case 'vendeur': return '/vendeur/dashboard';
         default: return '/auth/login';
     }
 };
@@ -39,6 +38,14 @@ exports.postLogin = async (req, res) => {
             photo: user.photo || null,
             telephone: user.telephone || null
         };
+        // Log connexion
+        const fs = require('fs');
+        const path = require('path');
+        const logFile = path.join(__dirname, '../logs/activity.log');
+        const ip = req.ip || req.connection.remoteAddress;
+        const date = new Date().toLocaleString('fr-FR');
+        const ligne = `[${date}] | CONNEXION | ${user.prenom} ${user.nom} (${user.role}) | Connexion au système | IP: ${ip}\n`;
+        try { fs.appendFileSync(logFile, ligne); } catch(e) {}
         res.redirect(redirectParRole(user.role));
     } catch (err) {
         console.error(err);
@@ -49,6 +56,10 @@ exports.postLogin = async (req, res) => {
 
 exports.logout = (req, res) => {
     req.session.destroy(() => {
+        res.clearCookie('connect.sid');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.redirect('/auth/login');
     });
 };

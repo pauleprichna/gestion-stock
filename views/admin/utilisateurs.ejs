@@ -43,7 +43,7 @@
                         <td class="align-middle"><%= u.email %></td>
                         <td class="align-middle"><%= u.telephone || '—' %></td>
                         <td class="align-middle">
-                            <% const roleColors = { administrateur:'danger', gestionnaire_catalogue:'warning', gestionnaire_stock:'success', fournisseur:'info', vendeur:'primary' }; %>
+                            <% const roleColors = { administrateur:'danger', gestionnaire_catalogue:'warning', gestionnaire_stock:'success', fournisseur:'info' }; %>
                             <span class="badge bg-<%= roleColors[u.role] || 'secondary' %>"><%= u.role.replace(/_/g,' ') %></span>
                         </td>
                         <td class="align-middle">

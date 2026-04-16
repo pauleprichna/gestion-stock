@@ -12,7 +12,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
     if (ct.includes('multipart/form-data')) {
         fileUpload()(req, res, next);
     } else if (ct.includes('application/x-www-form-urlencoded')) {
-        express.urlencoded({ extended: true })(req, res, next);
+        express.urlencoded({ extended: true, limit: '10mb' })(req, res, next);
     } else {
         next();
     }
@@ -42,6 +42,12 @@ app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
+    // Anti-cache pour les pages protégées
+    if (req.session.user) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
     next();
 });
 
@@ -51,7 +57,6 @@ app.use('/admin', require('./routes/admin'));
 app.use('/catalogue', require('./routes/catalogue'));
 app.use('/stock', require('./routes/stock'));
 app.use('/fournisseur', require('./routes/fournisseur'));
-app.use('/vendeur', require('./routes/vendeur'));
 app.use('/profil', require('./routes/profil'));
 
 app.use((req, res) => {

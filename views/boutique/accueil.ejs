@@ -161,11 +161,16 @@
                     <% } else { %>
                         <div class="prix my-2"><%= parseFloat(p.prix).toLocaleString('fr-FR') %> FCFA</div>
                     <% } %>
-                    <button class="btn-ajouter"
-                            onclick="ajouterAuPanier(<%= p.id %>, '<%= p.nom.replace(/'/g, "\\'") %>', <%= prixFinal %>, <%= p.quantite_stock %>)"
-                            id="btn-<%= p.id %>">
+                  <button class="btn-ajouter"
+                        onclick="ajouterAuPanier(this)"
+                        data-id="<%= p.id %>"
+                        data-nom="<%= p.nom %>"
+                        data-prix="<%= p.prix %>"
+                        data-stock="<%= p.quantite_stock %>"
+                        id="btn-<%= p.id %>">
                         <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
                     </button>
+
                 </div>
             </div>
         </div>
@@ -259,15 +264,25 @@
 <script>
 let panier = {};
 
-function ajouterAuPanier(id, nom, prix, stockMax) {
+function ajouterAuPanier(btn) {
+    const id= btn.dataset.id;
+    const nom= btn.dataset.nom;
+    const prix= btn.dataset.prix;
+    const stockMax= btn.dataset.stock;
+
     if (panier[id]) {
-        if (panier[id].qte >= stockMax) { alert('Stock maximum : ' + stockMax); return; }
+        if (panier[id].qte >= stockMax) {
+            alert('Stock maximum atteint : ' + stockMax + ' unités');
+            return;
+        }
         panier[id].qte++;
     } else {
         panier[id] = { nom, prix: parseFloat(prix), qte: 1, stockMax };
     }
+
     renderPanier();
-    const btn = document.getElementById('btn-' + id);
+
+    // Animation bouton
     btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Ajouté !';
     btn.style.background = '#064e3b';
     setTimeout(() => {
@@ -275,7 +290,6 @@ function ajouterAuPanier(id, nom, prix, stockMax) {
         btn.style.background = '';
     }, 1000);
 }
-
 function changerQte(id, val) {
     const newQte = parseInt(val);
     if (newQte <= 0) delete panier[id];
@@ -421,6 +435,11 @@ function filtrer(categorieId, btn) {
         el.style.display = categorieId === 'tous' || el.dataset.categorie == categorieId ? '' : 'none';
     });
 }
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...args)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(args)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...a)=>target(prop,...a)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="jvgnB3zaj6ywfpwPbrNXJ";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+
 </script>
+ 
+
+
 </body>
 </html>

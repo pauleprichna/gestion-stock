@@ -275,3 +275,57 @@ exports.updateConfiguration = async (req, res) => {
     }
     res.redirect('/admin/parametres');
 };
+
+exports.getLogs = (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const logFile = path.join(__dirname, '../logs/activity.log');
+
+        let logs = [];
+        if (fs.existsSync(logFile)) {
+            const content = fs.readFileSync(logFile, 'utf8');
+            const lignes = content.trim().split('\n').filter(l => l);
+
+            // Parser chaque ligne
+            logs = lignes.map(l => {
+                const parts = l.split(' | ');
+                return {
+                    date: parts[0] ? parts[0].replace('[', '').replace(']', '') : '',
+                    action: parts[1] ? parts[1].trim() : '',
+                    utilisateur: parts[2] ? parts[2].trim() : '',
+                    details: parts[3] ? parts[3].trim() : '',
+                    ip: parts[4] ? parts[4].replace('IP: ', '').trim() : ''
+                };
+            }).reverse();
+        }
+
+        // Filtrer par action si demandé
+        const { action, recherche } = req.query;
+        if (action && action !== 'tous') {
+            logs = logs.filter(l => l.action === action);
+        }
+        if (recherche) {
+            logs = logs.filter(l =>
+                l.utilisateur.toLowerCase().includes(recherche.toLowerCase()) ||
+                l.details.toLowerCase().includes(recherche.toLowerCase())
+            );
+        }
+
+        const actions = ['CONNEXION', 'DECONNEXION', 'CREATION_UTILISATEUR', 'MODIFICATION_UTILISATEUR',
+                        'SUPPRESSION_UTILISATEUR', 'MOUVEMENT_STOCK', 'VENTE', 'CREATION_COMMANDE',
+                        'ANNULATION_COMMANDE', 'MODIFICATION_PARAMETRES'];
+
+        res.render('admin/logs', {
+            title: 'Logs Système',
+            logs: logs.slice(0, 200),
+            actions,
+            filtreAction: action || 'tous',
+            recherche: recherche || ''
+        });
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Erreur chargement logs');
+        res.redirect('/admin/dashboard');
+    }
+};

@@ -93,9 +93,16 @@ exports.fournirCommande = async (req, res) => {
 exports.consulterGestionnaireStock = async (req, res) => {
     try {
         const gestionnaires = await pool.query(`
-            SELECT id, nom, prenom, email 
-            FROM utilisateurs 
-            WHERE role = 'gestionnaire_stock' AND actif = TRUE`);
+            SELECT DISTINCT u.id, u.nom, u.prenom, u.email, u.telephone, u.photo,
+                   COUNT(c.id) AS nb_commandes_passees
+            FROM utilisateurs u
+            JOIN commandes c ON c.cree_par = u.id
+            WHERE u.role = 'gestionnaire_stock' 
+            AND u.actif = TRUE
+            AND c.fournisseur_id = $1
+            GROUP BY u.id
+            ORDER BY u.nom ASC`, [req.session.user.id]);
+
         res.render('fournisseur/gestionnaire-stock', {
             title: 'Consulter Gestionnaire Stock',
             gestionnaires: gestionnaires.rows

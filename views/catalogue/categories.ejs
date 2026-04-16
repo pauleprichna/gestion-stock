@@ -9,10 +9,13 @@
     </div>
     <% if (success && success.length > 0) { %><div class="alert alert-success"><%= success %></div><% } %>
     <% if (error && error.length > 0) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header" style="background:#064e3b; color:white;"><i class="bi bi-plus-circle me-2"></i>Nouvelle catégorie</div>
+                <div class="card-header" style="background:#064e3b; color:white;">
+                    <i class="bi bi-plus-circle me-2"></i>Nouvelle catégorie
+                </div>
                 <div class="card-body">
                     <form action="/catalogue/categories" method="POST">
                         <div class="mb-3">
@@ -23,17 +26,25 @@
                             <label class="form-label fw-semibold">Description</label>
                             <textarea name="description" class="form-control" rows="3"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check me-2"></i>Créer</button>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check me-2"></i>Créer
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
+
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body p-0">
                     <table class="table table-hover mb-0">
                         <thead style="background:#064e3b; color:white;">
-                            <tr><th class="px-4 py-3">Nom</th><th>Description</th><th>Date</th><th class="text-center">Action</th></tr>
+                            <tr>
+                                <th class="px-4 py-3">Nom</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
                         </thead>
                         <tbody>
                         <% categories.forEach(c => { %>
@@ -42,11 +53,49 @@
                                 <td><%= c.description || '—' %></td>
                                 <td><%= new Date(c.date_creation).toLocaleDateString('fr-FR') %></td>
                                 <td class="text-center">
-                                    <form action="/catalogue/categories/<%= c.id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ?')">
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    <button class="btn btn-sm btn-outline-success me-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalModifier<%= c.id %>">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form action="/catalogue/categories/<%= c.id %>?_method=DELETE" method="POST"
+                                          class="d-inline" onsubmit="return confirm('Supprimer cette catégorie ?')">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
+
+                            <!-- Modal Modifier -->
+                            <div class="modal fade" id="modalModifier<%= c.id %>" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="background:#064e3b; color:white;">
+                                            <h5 class="modal-title">
+                                                <i class="bi bi-pencil me-2"></i>Modifier — <%= c.nom %>
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="/catalogue/categories/<%= c.id %>?_method=PUT" method="POST">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold">Nom *</label>
+                                                    <input type="text" name="nom" class="form-control"
+                                                           value="<%= c.nom %>" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold">Description</label>
+                                                    <textarea name="description" class="form-control" rows="3"><%= c.description || '' %></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary w-100">
+                                                    <i class="bi bi-check me-2"></i>Enregistrer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <% }) %>
                         </tbody>
                     </table>
