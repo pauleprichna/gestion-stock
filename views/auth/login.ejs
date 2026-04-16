@@ -15,9 +15,37 @@
         .btn-login { background:linear-gradient(135deg,#16a34a,#065f46); border:none; padding:13px; font-weight:700; font-size:1rem; letter-spacing:0.5px; border-radius:10px; }
         .btn-login:hover { opacity:0.9; transform:translateY(-1px); }
         label { font-weight:600; color:#374151; font-size:0.9rem; }
+
+        /*style bouton retour*/
+        .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: 10px;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s;
+    position: absolute;
+    top: 25px;
+    left: 25px;
+}
+.btn-back:hover { background: rgba(255,255,255,0.25); color: #fff; }
+</style>
     </style>
+
+
 </head>
 <body>
+    <!-- Bouton retour -->
+<a href="/" class="btn-back">
+    <i class="bi bi-arrow-left"></i> Accueil
+</a>
 <div class="login-card">
     <div class="login-logo">
         <div class="icon-box"><img src="/images/logo-small.png" style="width:40px;height:40px;object-fit:cover;border-radius:8px;"></div>
@@ -50,5 +78,21 @@
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Empêche le retour arrière du navigateur et redirige vers l'accueil
+    history.pushState(null, null, window.location.href);
+
+    window.addEventListener('popstate', function () {
+        window.location.replace('/');
+    });
+</script>
+<script>
+    // Flèche retour du navigateur → redirige vers l'accueil
+    history.pushState(null, null, window.location.href);
+    window.addEventListener('popstate', function () {
+        window.location.replace('/');
+    });
+</script>
+
 </body>
 </html>

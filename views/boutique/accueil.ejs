@@ -31,12 +31,16 @@
             box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s; height: 100%;
         }
         .produit-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .produit-img { width: 100%; height: 180px; object-fit: cover; }
+        .produit-img { width: 100%; height: 180px; object-fit: contain; background: white; padding: 8px; }
         .produit-img-placeholder {
             width: 100%; height: 180px;
             background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            display: flex; align-items:center; justify-content:center;
+            display: flex; flex-direction: column; align-items:center; justify-content:center;
+            border-bottom: 1px solid #e5e7eb;
         }
+        .produit-card { display: flex; flex-direction: column; }
+        .produit-card .p-3 { flex: 1; display: flex; flex-direction: column; }
+        .produit-card .btn-ajouter { margin-top: auto; }
         .btn-ajouter {
             background: linear-gradient(135deg, #16a34a, #064e3b);
             border: none; color: white; padding: 10px;
@@ -97,7 +101,7 @@
 <nav class="navbar-boutique d-flex justify-content-between align-items-center mb-4">
     <a href="/" class="brand">
         <img src="/images/logo-small.png" style="width:35px;height:35px;object-fit:cover;border-radius:8px;margin-right:8px;vertical-align:middle;">
-        Fresh Market — Boutique
+        Fresh Market Boutique
     </a>
     <div class="d-flex align-items-center gap-3">
         <a href="/auth/login" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-in-right me-1"></i>Espace Staff</a>
@@ -111,7 +115,7 @@
 <div class="container-fluid px-4">
     <div class="text-center mb-4">
         <h1 class="fw-bold" style="color:#064e3b;">🛒 Nos Produits Alimentaires</h1>
-        <p class="text-muted fs-5">Qualité et fraîcheur garanties — Paiement en espèces</p>
+        <p class="text-muted fs-5">Qualité et fraîcheur garanties  Paiement en espèces</p>
     </div>
 
     <div class="d-flex gap-2 flex-wrap mb-4">
@@ -136,7 +140,8 @@
                     <img src="<%= p.image %>" class="produit-img" alt="<%= p.nom %>">
                 <% } else { %>
                     <div class="produit-img-placeholder">
-                        <i class="bi bi-basket2 text-success" style="font-size:4rem;"></i>
+                        <i class="bi bi-basket2 text-success" style="font-size:3.5rem; opacity:0.5;"></i>
+                        <span style="font-size:0.75rem; color:#9ca3af; margin-top:8px;">Aucune image</span>
                     </div>
                 <% } %>
                 <div class="p-3">
@@ -413,15 +418,15 @@ async function confirmerPaiement() {
                     <span>Total</span><span class="text-success">${parseFloat(data.montant_total).toLocaleString('fr-FR')} FCFA</span>
                 </div>
                 <div class="d-flex justify-content-between mt-1" style="color:#f59e0b;">
-                    <span>💰 Monnaie rendue</span>
+                    <span> Monnaie rendue</span>
                     <span>${parseFloat(data.monnaie_rendue).toLocaleString('fr-FR')} FCFA</span>
                 </div>
-                <div class="text-center mt-3 text-muted small">Merci pour votre achat ! 🎉</div>`;
+                <div class="text-center mt-3 text-muted small">Merci pour votre achat ! </div>`;
             document.getElementById('recu-contenu').innerHTML = recuHtml;
             new bootstrap.Modal(document.getElementById('modalRecu')).show();
             viderPanier();
         } else {
-            alert('❌ ' + data.message);
+            alert( data.message);
         }
     } catch (err) {
         alert('Erreur de connexion');
@@ -439,7 +444,5 @@ function filtrer(categorieId, btn) {
 
 </script>
  
-
-
 </body>
 </html>

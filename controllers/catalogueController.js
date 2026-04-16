@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const path = require('path');
 const fs = require('fs');
 
-exports.upload = (req, res, next) => next();
+exports.upload = (req, res, next) => next(); 
 
 exports.dashboard = async (req, res) => {
     try {
@@ -85,19 +85,14 @@ exports.getFormProduit = async (req, res) => {
 exports.creerProduit = async (req, res) => {
     const { nom, description, prix, quantite_stock, seuil_alerte, categorie_id } = req.body;
     let imagePath = null;
-    if (req.body.image_base64 && req.body.image_base64.startsWith('data:')) {
-        try {
-            const match = req.body.image_base64.match(/^data:image\/(\w+);base64,(.+)$/);
-            if (match) {
-                const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
-                const base64Data = match[2];
-                const filename = 'produit-' + Date.now() + '.' + ext;
-                const uploadDir = path.join(__dirname, '../public/images/produits');
-                if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-                fs.writeFileSync(path.join(uploadDir, filename), Buffer.from(base64Data, 'base64'));
-                imagePath = '/images/produits/' + filename;
-            }
-        } catch(e) { console.error('Erreur image:', e); }
+    if (req.files && req.files.image) {
+        const file = req.files.image;
+        const ext = path.extname(file.name).toLowerCase();
+        const filename = 'produit-' + Date.now() + ext;
+        const uploadDir = path.join(__dirname, '../public/images/produits');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+        await file.mv(path.join(uploadDir, filename));
+        imagePath = '/images/produits/' + filename;
     }
     try {
         await pool.query(
@@ -116,19 +111,14 @@ exports.modifierProduit = async (req, res) => {
     const { id } = req.params;
     const { nom, description, prix, seuil_alerte, categorie_id } = req.body;
     let imagePath = null;
-    if (req.body.image_base64 && req.body.image_base64.startsWith('data:')) {
-        try {
-            const match = req.body.image_base64.match(/^data:image\/(\w+);base64,(.+)$/);
-            if (match) {
-                const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
-                const base64Data = match[2];
-                const filename = 'produit-' + Date.now() + '.' + ext;
-                const uploadDir = path.join(__dirname, '../public/images/produits');
-                if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-                fs.writeFileSync(path.join(uploadDir, filename), Buffer.from(base64Data, 'base64'));
-                imagePath = '/images/produits/' + filename;
-            }
-        } catch(e) { console.error('Erreur image:', e); }
+    if (req.files && req.files.image) {
+        const file = req.files.image;
+        const ext = path.extname(file.name).toLowerCase();
+        const filename = 'produit-' + Date.now() + ext;
+        const uploadDir = path.join(__dirname, '../public/images/produits');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+        await file.mv(path.join(uploadDir, filename));
+        imagePath = '/images/produits/' + filename;
     }
     try {
         if (imagePath) {

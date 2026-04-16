@@ -14,7 +14,7 @@
         </div>
         <div class="card-body p-4">
             <form action="<%= produit ? '/catalogue/produits/' + produit.id + '/modifier' : '/catalogue/produits' %>" 
-                  method="POST">
+                  method="POST" enctype="application/x-www-form-urlencoded">
                 
                 <input type="hidden" name="image_base64" id="image_base64" value="<%= produit && produit.image ? produit.image : '' %>">
                 
